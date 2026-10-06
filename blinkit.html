@@ -697,6 +697,17 @@ h1{font-size:21px;line-height:1.15;margin:0 0 6px;font-weight:700;letter-spacing
 .leaflet-control-attribution a{color:#6B655C}
 .leaflet-bar a{color:#1F1D1A}
 @media (max-width:560px){.panel{width:auto;right:18px;padding:14px}.stats{gap:6px}h1{font-size:18px}}
+.more{display:none}
+@media (max-width:700px){
+ .panel{top:10px;left:10px;right:10px;width:auto;max-width:none;padding:12px 14px 10px;border-radius:12px}
+ .panel h1{font-size:17px;margin-bottom:4px}
+ .panel .eyebrow{font-size:9.5px;margin-bottom:3px}
+ .more{display:block;width:100%;margin-top:8px;font:inherit;font-size:12px;font-weight:600;color:#1F1D1A;background:#F3F0E8;border:1px solid var(--line);border-radius:8px;padding:7px 10px;cursor:pointer}
+ .panel:not(.collapsed){max-height:72vh;overflow-y:auto}
+ .panel.collapsed .sub,.panel.collapsed .stats,.panel.collapsed .legend,.panel.collapsed .toggles,.panel.collapsed .note{display:none}
+ .panel.collapsed .seg{margin:6px 0 0}
+ .stats{grid-template-columns:repeat(3,1fr)}
+}
 </style></head><body><div id="map"></div><div class="panel"><div class="eyebrow">Gurgaon · Competitor network</div><h1>Blinkit in Gurgaon</h1>
 <p class="sub">74 dark stores and the real 10-minute delivery zone around each, traced along the road network.</p>
 <div class="stats"><div class="stat"><b>74</b><span>dark stores</span></div><div class="stat"><b>307</b><span>sq km reachable in 10 min</span></div><div class="stat"><b>3.4x</b><span>average overlap between zones</span></div></div>
@@ -751,6 +762,14 @@ function drawBasemap(map){
   drawBasemap(map); window._map=map;
   return map;
 }
+function mobilePanel(){
+  const pn=document.querySelector('.panel'); if(!pn) return;
+  const b=document.createElement('button'); b.className='more';
+  const set=c=>{pn.classList.toggle('collapsed',c); b.textContent=c?'Show details \u25BE':'Hide details \u25B4';};
+  b.onclick=()=>set(!pn.classList.contains('collapsed'));
+  pn.appendChild(b); set(window.innerWidth<=700);
+}
+document.addEventListener('DOMContentLoaded',mobilePanel);
 function hashMode(){const m=(location.search+location.hash).match(/mode=(\d)/);return m?m[1]:null}
 </script><script>(function(){
 const D=window.MAPDATA, map=makeMap(), cv=L.canvas({padding:.5});
@@ -772,7 +791,7 @@ function zstyle(){const z=map.getZoom(); base.fillOpacity=z>=15?.03:z>=14?.045:z
  all.forEach(a=>{if(a.poly!==pinned)a.poly.setStyle(base)});}
 map.on('zoomend',zstyle);
 const fp=L.polygon(D.footprint.map(p=>p[0].map(c=>[c[1],c[0]])));
-map.fitBounds(fp.getBounds(),{padding:[20,20]}); if(window.innerWidth>900) map.panBy([-150,0],{animate:false}); zstyle();
+map.fitBounds(fp.getBounds(),window.innerWidth<=700?{paddingTopLeft:[10,window.innerWidth<=700?150:20],paddingBottomRight:[10,30]}:{padding:[20,20]}); if(window.innerWidth>900) map.panBy([-150,0],{animate:false}); zstyle();
 document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const L_=b.dataset.t==='zones'?zones:pts; if(map.hasLayer(L_)){map.removeLayer(L_);b.classList.add('off')}else{map.addLayer(L_);b.classList.remove('off')}});
 })();
 </script></body></html>
